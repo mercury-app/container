@@ -3,6 +3,13 @@
 Container for handling events inside mercury node containers.
 
 ### Usage
+
+### Build docker image
+
+```sh
+docker build . -t jupyter-mercury:latest
+```
+
 The interaction with this is done via python cli as this will usually be called using `docker exec` commands. 
 
 1. Create a new notebook inside container.
