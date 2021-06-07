@@ -1,5 +1,7 @@
 import click
 import json
+import os
+import jupyter_client
 
 from container.constants import DEFAULT_NOTEBOOK_DIR_PATH, JUPYTER_RUNTIME_DIR
 
@@ -12,7 +14,7 @@ class NotebookKernel:
             if os.path.splitext(_)[1] == ".json" and _.split("-")[0] == "kernel"
         ]
 
-        assert len(json_file) == 1, "two kernel jsons found"
+        assert len(json_file) == 1, "no/two kernel jsons found"
 
         cf = jupyter_client.find_connection_file(json_file[0])
         self._kernel_manager = jupyter_client.BlockingKernelClient(connection_file=cf)
