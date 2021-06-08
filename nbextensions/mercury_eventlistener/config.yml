@@ -1,0 +1,9 @@
+Type: Jupyter Notebook Extension
+Name: Mercury Event Listener
+Description: Adds an event listener to mercury notebooks.
+Link: readme.md
+Icon: icon.png
+Main: main.js
+Compatibility: 4.x, 5.x, 6.x
+Parameters:
+- none
