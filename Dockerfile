@@ -29,6 +29,16 @@ RUN ls
 RUN python3 -m container.cli create-notebook --name Untitled.ipynb
 
 RUN ls work/scripts/
+
+# Add mercury nb extension
+ARG NBEXTENSIONS_DIR="/opt/conda/lib/python3.8/site-packages/jupyter_contrib_nbextensions/nbextensions/"
+RUN pip3 install jupyter_contrib_nbextensions
+COPY nbextensions/mercury_eventlistener $NBEXTENSIONS_DIR/mercury_eventlistener
+RUN ls $NBEXTENSIONS_DIR
+
+RUN jupyter contrib nbextensions install
+RUN jupyter nbextension enable mercury_eventlistener/main
+
 # remove all token based access to notebooks
 CMD ["jupyter", "notebook", "--allow-root", "--no-browser","--NotebookApp.token=''","--NotebookApp.password=''"]
 
