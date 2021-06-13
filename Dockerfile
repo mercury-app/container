@@ -1,6 +1,6 @@
 # original source - https://github.com/jupyter/docker-stacks/blob/master/minimal-notebook/Dockerfile
 
-ARG BASE_CONTAINER=jupyter/minimal-notebook
+ARG BASE_CONTAINER=jupyter/minimal-notebook:python-3.8.8
 FROM $BASE_CONTAINER
 
 USER root
@@ -20,15 +20,6 @@ RUN echo 'c.NotebookApp.tornado_settings = { \
 # copy container src code and install dependecies
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
-COPY container/ container/
-
-# create an empty untitled.ipynb
-RUN mkdir work/scripts/
-RUN ls
-
-RUN python3 -m container.cli create-notebook --name Untitled.ipynb
-
-RUN ls work/scripts/
 
 # Add mercury nb extension
 ARG NBEXTENSIONS_DIR="/opt/conda/lib/python3.8/site-packages/jupyter_contrib_nbextensions/nbextensions/"
@@ -38,6 +29,15 @@ RUN ls $NBEXTENSIONS_DIR
 
 RUN jupyter contrib nbextensions install
 RUN jupyter nbextension enable mercury_eventlistener/main
+
+COPY container/ container/
+
+# create an empty untitled.ipynb
+RUN mkdir work/scripts/
+RUN ls
+RUN python3 -m container.cli create-notebook --name Untitled.ipynb
+
+RUN ls work/scripts/
 
 # remove all token based access to notebooks
 CMD ["jupyter", "notebook", "--allow-root", "--no-browser","--NotebookApp.token=''","--NotebookApp.password=''"]
