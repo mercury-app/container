@@ -28,9 +28,24 @@ class NotebookKernel:
         run_status = shell_msg["content"].get("status")
         if run_status == "error":
             traceback = shell_msg["content"].get("traceback")
+            print(traceback)
 
         return {
             "io_msg_id": io_msg_id,
             "status": run_status,
             "traceback": traceback,
         }
+
+    def write_kernel_variables_to_json(self, variables, json_fp) -> dict:
+        self.execute_code("import json")
+        print("import completed")
+
+        json_to_write = "{"
+        for variable in variables:
+            json_to_write += f"'{variable}': {variable}, "
+        json_to_write += "}"
+        
+        code = f"json.dump({json_to_write}, open('{json_fp}', 'w'))"
+        print(f"running code -- {code}")
+
+        return self.execute_code(code)
