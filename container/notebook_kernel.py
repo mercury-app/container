@@ -36,13 +36,14 @@ class NotebookKernel:
             "traceback": traceback,
         }
 
-    def write_kernel_variables_to_json(self, variables, json_fp) -> dict:
+    def write_kernel_variables_to_json(self, source_outputs, dest_inputs, json_fp) -> dict:
         self.execute_code("import json")
         print("import completed")
 
+        assert len(source_outputs) == len(dest_inputs)
         json_to_write = "{"
-        for variable in variables:
-            json_to_write += f"'{variable}': {variable}, "
+        for source_output, dest_input in zip(source_outputs, dest_inputs):
+            json_to_write += f"'{dest_input}': {source_output}, "
         json_to_write += "}"
         
         code = f"json.dump({json_to_write}, open('{json_fp}', 'w'))"

@@ -24,12 +24,14 @@ def execute_code(code):
     notebook_kernel.execute_code(code)
 
 @cli.command()
-@click.option("--variables", help="pipe separated list of variables")
-@click.option("--json", help="json file path")
-def write_kernel_variables_to_json(variables, json):
+@click.option("--source_outputs", required=True, help="pipe separated list of input variables whose values will be written")
+@click.option("--dest_inputs", required=True, help="pipe separated list of variable names that will be written in the json as keys")
+@click.option("--json", required=True, help="json file path")
+def write_kernel_variables_to_json(source_outputs, dest_inputs, json):
     notebook_kernel = NotebookKernel()
-    variables = [_.strip() for _ in variables.split("|")]
-    notebook_kernel.write_kernel_variables_to_json(variables, json)
+    source_outputs = [_.strip() for _ in source_outputs.split("|")]
+    dest_inputs = [_.strip() for _ in dest_inputs.split("|")]
+    notebook_kernel.write_kernel_variables_to_json(source_outputs, dest_inputs, json)
 
 
 if __name__ == "__main__":
