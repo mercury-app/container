@@ -19,8 +19,9 @@ window.addEventListener('message', event => {
                 else
                     Jupyter.notebook.insert_cell_at_index('code', 0).set_text(code);
             }
-              console.log(event.data);
-              console.log("cell added")
+                Jupyter.notebook.get_cell(0)._metadata = {"trusted": true, "editable": false, 
+                                                          "deletable": false}
+                console.log("input cell added")
           }
 
           if (data.action == "add_output_cell"){
@@ -32,8 +33,9 @@ window.addEventListener('message', event => {
                 else
                     Jupyter.notebook.insert_cell_at_bottom('code').set_text(code);
             }
-              console.log(event.data);
-              console.log("cell added")            
+                Jupyter.notebook.get_cell(-1)._metadata = {"trusted": true, "editable": false, 
+                                                           "deletable": false}
+                console.log("output cell added")            
           }
         } else {
           console.log("BACK OFF")
