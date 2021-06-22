@@ -33,6 +33,11 @@ def write_kernel_variables_to_json(source_outputs, dest_inputs, json):
     dest_inputs = [_.strip() for _ in dest_inputs.split("|")]
     notebook_kernel.write_kernel_variables_to_json(source_outputs, dest_inputs, json)
 
+@cli.command()
+def post_kernel_status():
+    noteboook_kernel = NotebookKernel()
+    noteboook_kernel.post_kernel_status()
+
 
 if __name__ == "__main__":
     cli()

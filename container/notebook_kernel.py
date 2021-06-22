@@ -1,9 +1,10 @@
 import click
 import json
 import os
+import requests
 import jupyter_client
 
-from container.constants import DEFAULT_NOTEBOOK_DIR_PATH, JUPYTER_RUNTIME_DIR
+from container.constants import JUPYTER_RUNTIME_DIR, HOST_PORT
 
 
 class NotebookKernel:
@@ -50,3 +51,33 @@ class NotebookKernel:
         print(f"running code -- {code}")
 
         return self.execute_code(code)
+
+    def post_kernel_status(self):
+        while True:
+            iopub_msg = self._kernel_manager.get_iopub_msg()
+            
+            node_id = os.environ.get("MERCURY_NODE")
+            url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
+
+            if iopub_msg["msg_type"] == "status":
+                kernel_status = iopub_msg["content"]["execution_state"]
+            print('KERNEL STATUS: ', kernel_status)
+            
+            data = {
+                    "data": {
+                        "id": node_id,
+                        "type": "nodes",
+                        "attributes": {
+                            "kernel_state": kernel_status
+                        }
+                    }
+                }
+            
+            headers = {
+                'Content-Type': 'application/vnd.api+json',
+                'Accept': 'application/vnd.api+json'
+                }
+            
+            response = requests.patch(url, headers=headers, json=data)
+            print(response.status_code, response.json())
+
