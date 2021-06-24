@@ -18,6 +18,7 @@ RUN echo 'c.NotebookApp.tornado_settings = { \
     }' >> /home/jovyan/.jupyter/jupyter_notebook_config.py
 
 # copy container src code and install dependecies
+RUN pip3 install supervisor
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
@@ -39,8 +40,13 @@ RUN python3 -m container.cli create-notebook --name Untitled.ipynb
 
 RUN ls work/scripts/
 
+ADD supervisord.conf /etc/supervisor/supervisord.conf 
+
+RUN ls /etc/supervisor
+
+ENTRYPOINT ["/opt/conda/bin/supervisord"]
 # remove all token based access to notebooks
-CMD ["jupyter", "notebook", "--allow-root", "--no-browser","--NotebookApp.token=''","--NotebookApp.password=''"]
+#CMD ["jupyter", "notebook", "--allow-root", "--no-browser","--NotebookApp.token=''","--NotebookApp.password=''"]
 
 
 

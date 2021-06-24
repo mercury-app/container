@@ -54,6 +54,17 @@ class NotebookKernel:
 
     def post_kernel_status(self):
         while True:
+            json_file = [
+                _ for _ in os.listdir(JUPYTER_RUNTIME_DIR)
+                if os.path.splitext(_)[1] == ".json" and _.split("-")[0] == "kernel"
+            ]
+
+            if len(json_file) == 1:
+                print("kernel start detected")
+                break
+
+        while True:
+
             iopub_msg = self._kernel_manager.get_iopub_msg()
             
             node_id = os.environ.get("MERCURY_NODE")
