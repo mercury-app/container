@@ -4,9 +4,10 @@ from notebook.services.contents.filemanager import FileContentsManager as FCM
 import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
 import os
+import requests
 
 from container.notebook_kernel import NotebookKernel
-from container.constants import DEFAULT_NOTEBOOK_DIR_PATH, JUPYTER_RUNTIME_DIR
+from container.constants import DEFAULT_NOTEBOOK_DIR_PATH, JUPYTER_RUNTIME_DIR, HOST_PORT
 
 
 @click.group()
@@ -72,8 +73,10 @@ def run_notebook(notebook_path):
     
     ep = ExecutePreprocessor(timeout=600, kernel_name='python3')
 
+    exit_code = 1
     try:
         ep.preprocess(nb, {'metadata': {'path': DEFAULT_NOTEBOOK_DIR_PATH}})
+        exit_code = 0
     except CellExecutionError:
         out = None
         msg = f"Error executing the notebook {notebook_path}.\n\n"
@@ -83,6 +86,27 @@ def run_notebook(notebook_path):
         print("overwriting notebook")
         with open(notebook_path, mode='w', encoding='utf-8') as f:
             nbformat.write(nb, f)
+
+        node_id = os.environ.get("MERCURY_NODE")
+        url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
+
+        data = {
+                "data": {
+                    "id": node_id,
+                    "type": "nodes",
+                    "attributes": {
+                        "notebook_exec_exit_code": exit_code
+                    }
+                }
+            }
+        
+        headers = {
+            'Content-Type': 'application/vnd.api+json',
+            'Accept': 'application/vnd.api+json'
+            }
+        
+        response = requests.patch(url, headers=headers, json=data)
+        print(response.status_code, response.json())
 
 
 if __name__ == "__main__":
