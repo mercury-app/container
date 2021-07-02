@@ -5,6 +5,7 @@ import nbformat
 from nbconvert.preprocessors import ExecutePreprocessor, CellExecutionError
 import os
 import requests
+import subprocess
 
 from container.notebook_kernel import NotebookKernel
 from container.constants import DEFAULT_NOTEBOOK_DIR_PATH, JUPYTER_RUNTIME_DIR, HOST_PORT
@@ -107,6 +108,36 @@ def run_notebook(notebook_path):
         
         response = requests.patch(url, headers=headers, json=data)
         print(response.status_code, response.json())
+
+
+@cli.command()
+def post_jupyter_status():
+    while True:
+
+        output = subprocess.check_output("jupyter notebook list | sed -n '2 p'", shell=True)
+        if '8888' in output.decode():
+            print("jupyter server is running. posting to orchestration")
+            node_id = os.environ.get("MERCURY_NODE")
+            url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
+
+            data = {
+                    "data": {
+                        "id": node_id,
+                        "type": "nodes",
+                        "attributes": {
+                            "jupyter_server": True
+                        }
+                    }
+                }
+            
+            headers = {
+                'Content-Type': 'application/vnd.api+json',
+                'Accept': 'application/vnd.api+json'
+                }
+            
+            response = requests.patch(url, headers=headers, json=data)
+            print(response.status_code, response.json())
+            break
 
 
 if __name__ == "__main__":
