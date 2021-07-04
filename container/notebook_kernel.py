@@ -77,7 +77,7 @@ class NotebookKernel:
 
         return self.execute_code(code)
 
-    def post_kernel_status(self):
+    def post_kernel_status(self, client: str):
         while True:
             iopub_msg = self._kernel_manager.get_iopub_msg()
 
@@ -101,12 +101,15 @@ class NotebookKernel:
                     "data": {
                         "id": node_id,
                         "type": "nodes",
-                        "attributes": {
-                            "kernel_state": kernel_status
-                        }
                     }
                 }
+
+            if client == "jupyter":
+                data["data"]["attributes"] = {"kernel_state": kernel_status}
             
+            if client == "nbclient":
+                data["data"]["attributes"] = {"workflow_kernel_state": kernel_status}
+
             headers = {
                 'Content-Type': 'application/vnd.api+json',
                 'Accept': 'application/vnd.api+json'

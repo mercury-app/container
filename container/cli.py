@@ -1,4 +1,3 @@
-from logging import shutdown
 import click
 from notebook.services.contents.filemanager import FileContentsManager as FCM
 import nbformat
@@ -43,12 +42,6 @@ def write_kernel_variables_to_json(source_outputs, dest_inputs, json):
 @cli.command()
 @click.option('--client', required=True, help="kernel client- jupyter or nbclient")
 def post_kernel_status(client):
-
-    if client == "nbclient":
-        notebook_kernel = NotebookKernel(client="jupyter")
-        if notebook_kernel._kernel_manager:
-            notebook_kernel.shutdown_kernel()
-
     while True:
         kernel_not_found = True
         while kernel_not_found:
@@ -57,7 +50,7 @@ def post_kernel_status(client):
                 kernel_not_found = False
                 break
 
-        notebook_kernel.post_kernel_status()
+        notebook_kernel.post_kernel_status(client=client)
         
 
 @cli.command()
@@ -66,8 +59,8 @@ def run_notebook(notebook_path):
     
     # shut down jupyter clients
     notebook_kernel = NotebookKernel(client="jupyter")
-    if notebook_kernel._kernel_manager:
-        notebook_kernel.shutdown_kernel()
+    # if notebook_kernel._kernel_manager:
+        # notebook_kernel.shutdown_kernel()
 
     with open(notebook_path) as f:
         nb = nbformat.read(f, as_version=4)
