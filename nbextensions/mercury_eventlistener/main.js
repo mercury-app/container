@@ -21,7 +21,9 @@ window.addEventListener('message', event => {
             }
                 Jupyter.notebook.get_cell(0)._metadata = {"trusted": true, "editable": false, 
                                                           "deletable": false}
-                console.log("input cell added")
+                
+                Jupyter.notebook.execute_cells([0])
+                console.log("input cell added and executed")
           }
 
           if (data.action == "add_output_cell"){
@@ -35,6 +37,7 @@ window.addEventListener('message', event => {
             }
                 Jupyter.notebook.get_cell(-1)._metadata = {"trusted": true, "editable": false, 
                                                            "deletable": false}
+                Jupyter.notebook.execute_cells([-1])
                 console.log("output cell added")            
           }
         } else {
