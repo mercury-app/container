@@ -61,6 +61,26 @@ def run_notebook(notebook_path):
     notebook_kernel = NotebookKernel(client="jupyter")
     # if notebook_kernel._kernel_manager:
         # notebook_kernel.shutdown_kernel()
+    node_id = os.environ.get("MERCURY_NODE")
+    url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
+
+    data = {
+            "data": {
+                "id": node_id,
+                "type": "nodes",
+                "attributes": {
+                    "notebook_exec_pid": os.getpid()
+                }
+            }
+        }
+    
+    headers = {
+        'Content-Type': 'application/vnd.api+json',
+        'Accept': 'application/vnd.api+json'
+        }
+    
+    response = requests.patch(url, headers=headers, json=data)
+    print(response.status_code, response.json())
 
     with open(notebook_path) as f:
         nb = nbformat.read(f, as_version=4)
@@ -81,24 +101,7 @@ def run_notebook(notebook_path):
         with open(notebook_path, mode='w', encoding='utf-8') as f:
             nbformat.write(nb, f)
 
-        node_id = os.environ.get("MERCURY_NODE")
-        url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
-
-        data = {
-                "data": {
-                    "id": node_id,
-                    "type": "nodes",
-                    "attributes": {
-                        "notebook_exec_exit_code": exit_code
-                    }
-                }
-            }
-        
-        headers = {
-            'Content-Type': 'application/vnd.api+json',
-            'Accept': 'application/vnd.api+json'
-            }
-        
+        data["data"]["attributes"]["notebook_exec_exit_code"]  = exit_code
         response = requests.patch(url, headers=headers, json=data)
         print(response.status_code, response.json())
 
