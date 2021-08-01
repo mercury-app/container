@@ -1,7 +1,12 @@
 console.log("Loading mercury event listener nbextension")
 
 // send message to parent telling the frame url
-parent.postMessage("Hello", "http://localhost:5000");
+parent.postMessage({"scope": "mercury"}, "http://localhost:5000");
+
+async function saveNotebook(Jupyter){
+    await Jupyter.notebook.save_checkpoint()
+    console.log("notebook saved")
+}
 
 window.addEventListener('message', event => {
       // IMPORTANT: check the origin of the data!
@@ -39,6 +44,10 @@ window.addEventListener('message', event => {
                                                            "deletable": false}
                 Jupyter.notebook.execute_cells([-1])
                 console.log("output cell added")            
+          }
+
+          if (data.action == "save_notebook"){
+            saveNotebook(Jupyter)     
           }
         } else {
           console.log("BACK OFF")
