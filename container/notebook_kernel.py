@@ -6,7 +6,7 @@ import requests
 import jupyter_client
 import time
 
-from container.constants import JUPYTER_RUNTIME_DIR, HOST_PORT
+from container.constants import HOST_IP, JUPYTER_RUNTIME_DIR, HOST_IP, HOST_PORT
 
 
 class NotebookKernel:
@@ -90,7 +90,7 @@ class NotebookKernel:
                     return kernel_shutdown
 
             node_id = os.environ.get("MERCURY_NODE")
-            url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
+            url = f"http://{HOST_IP}:{HOST_PORT}/nodes/{node_id}/notebook"
 
             if iopub_msg["msg_type"] == "status":
                 kernel_status = iopub_msg["content"]["execution_state"]
