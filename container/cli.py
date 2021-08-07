@@ -7,7 +7,7 @@ import requests
 import subprocess
 
 from container.notebook_kernel import NotebookKernel
-from container.constants import DEFAULT_NOTEBOOK_DIR_PATH, JUPYTER_RUNTIME_DIR, HOST_PORT
+from container.constants import DEFAULT_NOTEBOOK_DIR_PATH, JUPYTER_RUNTIME_DIR, HOST_IP, HOST_PORT
 
 
 @click.group()
@@ -62,7 +62,7 @@ def run_notebook(notebook_path):
     # if notebook_kernel._kernel_manager:
         # notebook_kernel.shutdown_kernel()
     node_id = os.environ.get("MERCURY_NODE")
-    url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
+    url = f"http://{HOST_IP}:{HOST_PORT}/nodes/{node_id}/notebook"
 
     data = {
             "data": {
@@ -114,7 +114,7 @@ def post_jupyter_status():
         if '8888' in output.decode():
             print("jupyter server is running. posting to orchestration")
             node_id = os.environ.get("MERCURY_NODE")
-            url = f"http://host.docker.internal:{HOST_PORT}/nodes/{node_id}/notebook"
+            url = f"http://{HOST_IP}:{HOST_PORT}/nodes/{node_id}/notebook"
 
             data = {
                     "data": {
